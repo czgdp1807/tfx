@@ -15,41 +15,49 @@
 # Base image used to facilitate docker building.
 # This gets updated nightly.
 
-# Use an ubuntu 20.04 image.
-FROM ubuntu:20.04
+# Use a newer LTS Ubuntu version
+FROM ubuntu:22.04
 LABEL maintainer="tensorflow-extended-dev@googlegroups.com"
 
 ARG DEBIAN_FRONTEND=noninteractive
-
 ARG APT_COMMAND="apt-get -o Acquire::Retries=3 -y"
 
-# Install python 3.10 and additional dependencies.
+# 1. Initial update and upgrade
 RUN ${APT_COMMAND} update && \
-  ${APT_COMMAND} install --no-install-recommends -q software-properties-common && \
-  add-apt-repository -y ppa:deadsnakes/ppa && \
-  ${APT_COMMAND} update && \
-  ${APT_COMMAND} install --no-install-recommends -q \
-  build-essential \
-  ca-certificates \
-  libsnappy-dev \
-  protobuf-compiler \
-  libprotobuf-dev \
-  python3.10-dev \
-  python3-distutils \
-  wget \
-  unzip \
-  git && \
-  update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 && \
-  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 && \
-  update-alternatives --install /usr/bin/python-config python-config /usr/bin/python3.10-config 1 && \
-  ${APT_COMMAND} autoclean && \
-  ${APT_COMMAND} autoremove --purge
+    ${APT_COMMAND} -qq upgrade
 
-# Pre-install pip so we can use the beta dependency resolver.
-RUN wget https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && \
-  pip install --upgrade --pre pip
+# 2. Install software-properties-common for add-apt-repository
+RUN ${APT_COMMAND} -qq install --no-install-recommends software-properties-common
 
-# Install bazel
-RUN wget -O /bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.14.0/bazelisk-linux-amd64 && \
+# 4. Install build tools and Python 3.10
+RUN ${APT_COMMAND} -qq install --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    libsnappy-dev \
+    protobuf-compiler \
+    libprotobuf-dev \
+    python3.10-dev \
+    python3-pip \
+    wget \
+    unzip \
+    git
+
+# 5. Set Python 3.10 as the default
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+
+# 6. Clean up apt
+RUN ${APT_COMMAND} autoclean && \
+    ${APT_COMMAND} autoremove --purge && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install/Upgrade pip
+RUN python3 -m pip install --upgrade --pre pip
+
+# Install bazel using bazelisk
+RUN wget -O /bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64 && \
   chmod +x /bin/bazel && \
   bazel version
+
+# Clean up pip cache
+RUN rm -rf /root/.cache/pip
