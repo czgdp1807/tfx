@@ -101,7 +101,8 @@ RUN  /opt/conda/bin/conda install -y -c conda-forge \
     gcc_linux-64=13 \
     gxx_linux-64=13 \
     binutils_linux-64=2.40 \
-    ld_impl_linux-64=2.40
+    ld_impl_linux-64=2.40 \
+    google-cloud-sdk
 
  ENV CC=/opt/conda/bin/x86_64-conda-linux-gnu-gcc
 
