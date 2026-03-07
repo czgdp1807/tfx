@@ -16,6 +16,11 @@
 # Convenience script to build TFX docker image.
 set -ex
 
+if [[ -n "${MY_BASE_IMAGE}" ]]; then
+  BASE_IMAGE="${MY_BASE_IMAGE}"
+  echo "Using MY_BASE_IMAGE: ${MY_BASE_IMAGE}"
+fi
+
 DOCKER_IMAGE_REPO=${DOCKER_IMAGE_REPO:-"tensorflow/tfx"}
 DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG:-"latest"}
 DOCKER_FILE=${DOCKER_FILE:-"Dockerfile"}
@@ -71,7 +76,9 @@ docker build --target wheel-builder\
   -t ${wheel_builder_tag} \
   -f tfx/tools/docker/${DOCKER_FILE} \
   --build-arg TFX_DEPENDENCY_SELECTOR=${TFX_DEPENDENCY_SELECTOR} \
-  . "$@"
+  --build-arg BASE_IMAGE=${BASE_IMAGE} \
+  --build-arg BEAM_VERSION=${MY_BEAM_VERSION} \
+  .
 
 # TensorFlow current TFX code depends on here and use that instead.
 if [[ -n "$BASE_IMAGE" ]]; then
@@ -116,7 +123,7 @@ docker build -t ${DOCKER_IMAGE_REPO}:${DOCKER_IMAGE_TAG} \
   --build-arg "BASE_IMAGE=${BASE_IMAGE}" \
   --build-arg "BEAM_VERSION=${beam_version}" \
   --build-arg "ADDITIONAL_PACKAGES=${ADDITIONAL_PACKAGES}" \
-  . "$@"
+  .
 
 if [[ -n "${installed_tf_version}" && ! "${installed_tf_version}" =~ rc ]]; then
   # Double-check whether TF is re-installed.
