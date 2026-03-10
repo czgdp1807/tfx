@@ -30,34 +30,38 @@ ENV USE_BAZEL_VERSION=6.5.0
 
 RUN python -m pip install --upgrade pip wheel setuptools==70.0.0 tomli
 
+# Install Bazel in the wheel-builder stage
+RUN CURRENT_DIR="$(pwd)" && \
+  mkdir -p /usr/local/lib/bazel/bin && \
+  cd "/usr/local/lib/bazel/bin" && \
+  curl -fLO https://releases.bazel.build/6.5.0/release/bazel-6.5.0-linux-x86_64 && \
+  chmod +x bazel-6.5.0-linux-x86_64 && \
+  ln -sf /usr/local/lib/bazel/bin/bazel-6.5.0-linux-x86_64 /usr/local/bin/bazel && \
+  cd "$CURRENT_DIR"
+
 # TODO(b/175089240): clean up conditional checks on whether ml-pipelines-sdk is
 # built after TFX versions <= 0.25 are no longer eligible for cherry-picks.
 RUN cd ${TFX_DIR}/src; \
     if [ -e "package_build" ]; then \
       bash -x package_build/initialize.sh; \
       cd package_build/ml-pipelines-sdk; \
-      CFLAGS=$(/usr/bin/python-config --cflags) \
         python setup.py bdist_wheel; \
       cd ../../package_build/tfx; \
-      CFLAGS=$(/usr/bin/python-config --cflags) \
         python setup.py bdist_wheel; \
       cd ../..; \
       MLSDK_WHEEL=$(find dist -name "ml_pipelines_sdk-*.whl"); \
       TFX_WHEEL=$(find dist -name "tfx-*.whl"); \
     else \
-      CFLAGS=$(/usr/bin/python-config --cflags) \
         python setup.py bdist_wheel; \
       MLSDK_WHEEL=; \
       TFX_WHEEL=$(find dist -name "tfx-*.whl"); \
     fi; \
     if [ "${TFX_DEPENDENCY_SELECTOR}" = "NIGHTLY" ]; then \
-      CFLAGS=$(/usr/bin/python-config --cflags) \
         python -m pip install \
           --extra-index-url https://pypi-nightly.tensorflow.org/simple \
-          ${MLSDK_WHEEL} ${TFX_WHEEL}[docker-image] -c tfx/tools/docker/requirements.txt -c tfx/tools/docker/build_constraints.txt; \
+          ${MLSDK_WHEEL} ${TFX_WHEEL} -c tfx/tools/docker/requirements.txt -c tfx/tools/docker/build_constraints.txt; \
     else \
-      CFLAGS=$(/usr/bin/python-config --cflags) \
-        python -m pip install ${MLSDK_WHEEL} ${TFX_WHEEL}[docker-image] -c tfx/tools/docker/requirements.txt -c tfx/tools/docker/build_constraints.txt; \
+        python -m pip install ${MLSDK_WHEEL} ${TFX_WHEEL} -c tfx/tools/docker/requirements.txt -c tfx/tools/docker/build_constraints.txt; \
     fi;
 
 # We need to name this step for the next COPY --from command.
@@ -134,9 +138,9 @@ RUN MLSDK_WHEEL=$(find dist -name "ml_pipelines_sdk-*.whl"); \
     if [ "${TFX_DEPENDENCY_SELECTOR}" = "NIGHTLY" ]; then \
       PIP_CONSTRAINT=/tmp/build_constraints.txt python -m pip install \
         --extra-index-url https://pypi-nightly.tensorflow.org/simple \
-        ${MLSDK_WHEEL} ${TFX_WHEEL}[docker-image] ${ADDITIONAL_PACKAGES} ; \
+        ${MLSDK_WHEEL} ${TFX_WHEEL} ${ADDITIONAL_PACKAGES} ; \
     else \
-      PIP_CONSTRAINT=/tmp/build_constraints.txt python -m pip install ${MLSDK_WHEEL} ${TFX_WHEEL}[docker-image] \
+      PIP_CONSTRAINT=/tmp/build_constraints.txt python -m pip install ${MLSDK_WHEEL} ${TFX_WHEEL} \
       ${ADDITIONAL_PACKAGES} ; \
     fi && \
     echo "Installed python packages:\n" && python -m pip list && \
