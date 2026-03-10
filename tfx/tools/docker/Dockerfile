@@ -30,6 +30,8 @@ ENV USE_BAZEL_VERSION=6.5.0
 
 RUN python -m pip install --upgrade pip wheel setuptools==70.0.0 tomli
 
+RUN apt-get update && apt-get install -y curl
+
 # Install Bazel in the wheel-builder stage
 RUN CURRENT_DIR="$(pwd)" && \
   mkdir -p /usr/local/lib/bazel/bin && \
