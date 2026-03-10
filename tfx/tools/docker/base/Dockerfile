@@ -37,7 +37,16 @@ RUN ${APT_COMMAND} -qq install --no-install-recommends \
     libprotobuf-dev \
     wget \
     unzip \
-    git
+    git \
+    apt-transport-https \
+    curl \
+    gnupg \
+    lsb-release && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
+    ${APT_COMMAND} update && \
+    ${APT_COMMAND} -qq install --no-install-recommends google-cloud-sdk
+
 
 # 5. Install Miniconda
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
@@ -45,13 +54,15 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     rm ~/miniconda.sh
 
 ENV PATH="/opt/conda/bin:$PATH"
-RUN conda config --set auto_update_conda false && \
-    conda config --set show_channel_urls true && \
-    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
-    conda init bash && \
-    conda update -n base -c defaults conda && \
-    conda clean --all -f -y
+    conda create -n py310 python=3.10 -y
+
+ENV PATH="/opt/conda/envs/py310/bin:$PATH"
+
+
+
+
 
 # 7. Clean up apt
 RUN ${APT_COMMAND} autoclean && \
