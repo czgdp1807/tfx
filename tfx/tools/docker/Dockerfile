@@ -17,7 +17,7 @@ ARG BASE_IMAGE
 # Apache beam version to get Beam binaries.
 ARG BEAM_VERSION
 
-FROM gcr.io/tfx-oss-public/tfx_base:py310-20230921 as wheel-builder
+FROM gcr.io/tfx-oss-public/tfx_base:py310-20260310 as wheel-builder
 # docker build command should be run under root directory of github checkout.
 ENV TFX_DIR=/tfx
 ADD . ${TFX_DIR}/src
