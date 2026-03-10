@@ -90,7 +90,7 @@ ENTRYPOINT ["/opt/apache/beam/boot"]
 
 LABEL maintainer="tensorflow-extended-dev@googlegroups.com"
 
-RUN sed -i 's/python3/python/g' /usr/bin/pip
+
 
 RUN python -m pip install --upgrade pip setuptools==70.0.0 wheel
 

@@ -73,9 +73,8 @@ docker build --target wheel-builder\
   --build-arg TFX_DEPENDENCY_SELECTOR=${TFX_DEPENDENCY_SELECTOR} \
   . "$@"
 
-# TensorFlow current TFX code depends on here and use that instead.
-if [[ -n "$BASE_IMAGE" ]]; then
-  echo "Using override base image $BASE_IMAGE"
+if [[ -n "${BASE_IMAGE}" ]]; then
+  echo "Using override base image ${BASE_IMAGE}"
 else
   tf_version=$(_get_tf_version_of_image "${wheel_builder_tag}")
   arr_version=(${tf_version//./ })
@@ -88,15 +87,7 @@ else
   if gcloud container images list --repository=${DLVM_REPO} | grep -x "${BASE_IMAGE}" ; then
     # TF shouldn't be re-installed so we pin TF version in Pip install.
     installed_tf_version=$(_get_tf_version_of_image "${BASE_IMAGE}")
-    # TODO(b/333895985): This should be rollbacked after the fix. The TF version
-    # from the BASE_IMAGE is wrongly set (expected: 2.15.1, actually: 2.15.0).
     ADDITIONAL_PACKAGES="tensorflow==${tf_version}"
-    # if [[ "${installed_tf_version}" =~ rc ]]; then
-    #   # Overwrite the rc version with a latest regular version.
-    #   ADDITIONAL_PACKAGES="tensorflow==${tf_version}"
-    # else
-    #   ADDITIONAL_PACKAGES="tensorflow==${installed_tf_version}"
-    # fi
   else
     # Fallback to the image of the previous version but also install the newest
     # TF version.
@@ -105,7 +96,7 @@ else
     ADDITIONAL_PACKAGES="tensorflow==${tf_version}"
   fi
 
-  echo "Using compatible tf2-gpu image $BASE_IMAGE as base"
+  echo "Using compatible tf2-gpu image ${BASE_IMAGE} as base"
 fi
 
 beam_version=$(docker run --rm --entrypoint=python ${wheel_builder_tag} -c 'import apache_beam as beam; print(beam.version.__version__)')
