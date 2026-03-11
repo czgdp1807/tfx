@@ -45,7 +45,15 @@ _pipeline_name = 'chicago_taxi_simple'
 # This example assumes that the taxi data is stored in ~/taxi/data and the
 # taxi utility function is in ~/taxi.  Feel free to customize this as needed.
 _taxi_root = os.path.join(os.environ['HOME'], 'taxi')
-_data_root = os.path.join(_taxi_root, 'data', 'simple')
+# Find the directory containing the TFX shared libraries.
+# Running from a normal installation:
+#   <python_dir>/site-packages/tfx/...
+# Running from a development build (e.g. from a cloned repo):
+#   .../tfx/tfx/examples/...
+_tfx_root = os.path.dirname(__file__) if '__file__' in locals() else '.'
+_data_root = os.path.join(
+    _tfx_root, '..', '..', '..', 'examples', 'chicago_taxi_pipeline', 'data',
+    'simple')
 # Python module file to inject customized logic into the TFX components. The
 # Transform and Trainer both require user-defined functions to run successfully.
 _module_file = os.path.join(_taxi_root, 'taxi_utils.py')
