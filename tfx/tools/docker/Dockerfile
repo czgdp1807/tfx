@@ -147,3 +147,12 @@ RUN MLSDK_WHEEL=$(find dist -name "ml_pipelines_sdk-*.whl"); \
     fi && \
     echo "Installed python packages:\n" && python -m pip list && \
     echo "Setuptools version:" && python -c "import setuptools; print(setuptools.__version__)"
+
+# Install packages from the 'docker-image' extra.
+RUN python -m pip install \
+    "kfp>=2.6.0,<2.7.0" \
+    "kfp-pipeline-spec>=0.3.0,<0.4.0" \
+    "mmh>=2.2,<3" \
+    "python-snappy>=0.7" \
+    "tensorflow-cloud>=0.1,<0.2" \
+    "tensorflow-io>=0.9.0, <=0.24.0"
