@@ -54,18 +54,12 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     rm ~/miniconda.sh
 
 ENV PATH="/opt/conda/bin:$PATH"
-RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
-    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
-    conda create -n py310 python=3.10 -y
-
-ENV PATH="/opt/conda/envs/py310/bin:$PATH"
-
-
-
+RUN /opt/conda/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    /opt/conda/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    /opt/conda/bin/conda install python=3.10 -y
 
 
 # 7. Clean up apt
 RUN ${APT_COMMAND} autoclean && \
     ${APT_COMMAND} autoremove --purge && \
     rm -rf /var/lib/apt/lists/*
-

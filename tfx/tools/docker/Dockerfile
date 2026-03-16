@@ -102,19 +102,6 @@ RUN CURRENT_DIR="$(pwd)" && \
   ln -sf /usr/local/lib/bazel/bin/bazel-6.5.0-linux-x86_64 /usr/local/bin/bazel && \
   cd "$CURRENT_DIR"
 
-# Build tensorflow-data-validation wheels from source with patch
-RUN  /opt/conda/bin/conda install -y -c conda-forge \
-    gcc_linux-64=13 \
-    gxx_linux-64=13 \
-    binutils_linux-64=2.40 \
-    ld_impl_linux-64=2.40
-
- ENV CC=/opt/conda/bin/x86_64-conda-linux-gnu-gcc
-
- ENV CXX=/opt/conda/bin/x86_64-conda-linux-gnu-g++
-
- ENV LD=/opt/conda/bin/x86_64-conda-linux-gnu-ld
-
 COPY tfx/tools/docker/build_tfdv_wheels.sh /tmp/
 COPY tfx/tools/docker/tfdv.patch /tmp/
 RUN mkdir -p /tmp/wheels && \
