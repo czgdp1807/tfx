@@ -271,7 +271,7 @@ ML_PIPELINES_SDK_ENTRY_POINTS = None
 # development convenience, the `tfx-dev` package containing the union of the
 # the `tfx` and `ml-pipelines-sdk` package can be installed as an editable
 # package using `pip install -e .`, but should not be built for distribution.
-if package_name == 'tfx-dev':
+if package_name == 'tfx-czgdp1807':
   # Monolithic development package with the entirety of `tfx.*` and the full
   # set of dependencies. Functionally equivalent to the union of the "tfx" and
   # "tfx-pipeline-sdk" packages.

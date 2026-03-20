@@ -111,8 +111,6 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/tfx-czgdp1807
-    permissions:
-      id-token: write
     steps:
       - name: Retrieve wheels and sdist
         uses: actions/download-artifact@v4
@@ -122,6 +120,13 @@ jobs:
 
       - name: List the build artifacts
         run: |
+          ls -lAs wheels/
+
+      - name: Keep only tfx artifacts
+        run: |
+          # For testing, publish only tfx artifacts and exclude ml-pipelines-sdk.
+          rm -f wheels/ml_pipelines_sdk-*
+          rm -f wheels/ml-pipelines-sdk-*
           ls -lAs wheels/
 
       - name: Upload to PyPI

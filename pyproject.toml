@@ -3,7 +3,7 @@ requires = ["setuptools==70", "wheel", "tomli"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tfx-dev"
+name = "tfx-czgdp1807"
 dynamic = ["version", "dependencies", "optional-dependencies", "scripts"]
 description = "TensorFlow Extended (TFX) is a TensorFlow-based general-purpose machine learning platform implemented at Google."
 readme = "README.md"
