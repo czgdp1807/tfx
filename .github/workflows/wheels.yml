@@ -110,7 +110,7 @@ jobs:
     needs: [build_wheels, build_sdist]
     environment:
       name: pypi
-      url: https://pypi.org/p/tfx
+      url: https://pypi.org/p/tfx-czgdp1807
     permissions:
       id-token: write
     steps:
